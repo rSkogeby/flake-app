@@ -28,17 +28,20 @@ def restaurantMenu(restaurant_id):
     return output
 
 
-# Create route for newMenuItem function 
+# Create route for newMenuItem function
+@app.route('/restaurant/<int:restaurant_id>/create/')
 def newMenuItem(restaurant_id):
     return "page to create a new menu item. Task 1 complete!"
 
 
-# Create route for editMenuItem function 
+# Create route for editMenuItem function
+@app.route('/restaurant/<int:restaurant_id>/<int:menu_id>/edit/')
 def editMenuItem(restaurant_id, menu_id):
     return "page to edit a menu item. Task 2 complete!"
 
 
 # Create a route for deleteMenuItem function
+@app.route('/restaurant/<int:restaurant_id>/<int:menu_id>/delete/')
 def deleteMenuItem(restaurant_id, menu_id):
     return "page to delete a menu item. Task 3 complete!"
 
