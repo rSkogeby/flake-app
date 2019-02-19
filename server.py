@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for
 app = Flask(__name__) 
 
 from db_setup import Base, Restaurant, MenuItem
@@ -21,7 +21,12 @@ def restaurantMenu(restaurant_id):
 # Create route for newMenuItem function
 @app.route('/restaurant/<int:restaurant_id>/create/', methods=['GET', 'POST'])
 def newMenuItem(restaurant_id):
-    return "page to create a new menu item. Task 1 complete!"
+    if request.method == 'POST':
+        pass
+    elif request.method == 'GET':
+        pass
+    else:
+        pass
 
 
 # Create route for editMenuItem function
