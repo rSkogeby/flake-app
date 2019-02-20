@@ -1,25 +1,36 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from flask import Flask, render_template, request, redirect, url_for
+from werkzeug.datastructures import ImmutableMultiDict
 app = Flask(__name__) 
 
 from db_setup import Base, Restaurant, MenuItem
 
-engine = create_engine('sqlite:///restaurantmenu.db')
+engine = create_engine('sqlite:///restaurantmenu.db', connect_args={'check_same_thread': False})
 Base.metadata.bind = engine
-DBSession = sessionmaker(bind=engine)
 
-def isEmpty(dct):
+
+def isEmpty(inp):
     """Return true if dict is empty, false if not."""
     empty = ''
-    for k,v in dct.items():
-        if v is empty:
-            continue
-        return False    
-    return True
+    if isinstance(inp, ImmutableMultiDict):
+        for k,v in inp.items():
+            print(k,v)
+            if v is empty:
+                continue
+            return False
+        return True
+    else:
+        for item in inp:
+            print(item)
+            if item is empty:                
+                continue
+            return False
+        return True
 
 @app.route('/restaurant/<int:restaurant_id>/')
 def restaurantMenu(restaurant_id):
+    DBSession = sessionmaker(bind=engine)
     session = DBSession()
     restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
     items = session.query(MenuItem).filter_by(restaurant_id=restaurant.id)
@@ -30,6 +41,7 @@ def restaurantMenu(restaurant_id):
 @app.route('/restaurant/<int:restaurant_id>/create/', methods=['GET', 'POST'])
 def newMenuItem(restaurant_id):
     if request.method == 'POST':
+        DBSession = sessionmaker(bind=engine)
         session = DBSession()
         newItem = MenuItem(name=request.form['name'],
                            description=request.form['description'],
@@ -50,6 +62,7 @@ def newMenuItem(restaurant_id):
 # Create route for editMenuItem function
 @app.route('/restaurant/<int:restaurant_id>/<int:menu_id>/edit/', methods=['GET', 'POST'])
 def editMenuItem(restaurant_id, menu_id):
+    DBSession = sessionmaker(bind=engine)
     session = DBSession()
     edited_menu_item = session.query(MenuItem).filter_by(id=menu_id).one()
     if request.method == 'POST':
@@ -58,9 +71,12 @@ def editMenuItem(restaurant_id, menu_id):
         #    return redirect(url_for(restaurantMenu, restaurant_id=restaurant_id))
         if isEmpty(request.form):
             return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id))
-        edited_menu_item.name=request.form['name']
-        edited_menu_item.description=request.form['description']
-        edited_menu_item.price=request.form['price']
+        if ~isEmpty(request.form['name']):
+            edited_menu_item.name=request.form['name']
+        if ~isEmpty(request.form['description']):
+            edited_menu_item.description=request.form['description']
+        if ~isEmpty(request.form['price']):
+            edited_menu_item.price=request.form['price']
         session.add(edited_menu_item)
         session.commit()
         return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id))
