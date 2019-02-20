@@ -22,11 +22,22 @@ def restaurantMenu(restaurant_id):
 @app.route('/restaurant/<int:restaurant_id>/create/', methods=['GET', 'POST'])
 def newMenuItem(restaurant_id):
     if request.method == 'POST':
-        pass
+        newItem = MenuItem(name=request.form['name'],
+                           description=request.form['description'],
+                           price=request.form['price'],
+                           restaurant_id=restaurant_id)
+        session.add(newItem)
+        session.commit()
+        return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id),
+                        code=301)
     elif request.method == 'GET':
-        pass
-    else:
-        pass
+        #return render_template('menu.html', restaurant=restaurant, items=items)
+
+        return render_template('newmenuitem.html', restaurant_id=
+            restaurant_id)
+    #else:
+    #    return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id),
+    #                    code=301)
 
 
 # Create route for editMenuItem function
