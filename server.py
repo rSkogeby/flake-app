@@ -12,18 +12,11 @@ DBSession = sessionmaker(bind=engine)
 def isEmpty(dct):
     """Return true if dict is empty, false if not."""
     empty = ''
-    number_empty = 0
-    number_not_empty = 0
     for k,v in dct.items():
         if v is empty:
-            number_empty = number_empty + 1
             continue
-        else:
-            number_not_empty = number_not_empty + 1
-    if number_empty == number_not_empty:
-        return False
-    else:
-        return True
+        return False    
+    return True
 
 @app.route('/restaurant/<int:restaurant_id>/')
 def restaurantMenu(restaurant_id):
