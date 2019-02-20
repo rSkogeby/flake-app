@@ -31,20 +31,22 @@ def newMenuItem(restaurant_id):
         return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id),
                         code=301)
     elif request.method == 'GET':
-        #return render_template('menu.html', restaurant=restaurant, items=items)
-
         return render_template('newmenuitem.html', restaurant_id=
             restaurant_id)
-    #else:
-    #    return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id),
-    #                    code=301)
+    else:
+        return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id),
+                        code=301)
 
 
 # Create route for editMenuItem function
-@app.route('/restaurant/<int:restaurant_id>/<int:menu_id>/edit/')
+@app.route('/restaurant/<int:restaurant_id>/<int:menu_id>/edit/', methods=['GET', 'POST'])
 def editMenuItem(restaurant_id, menu_id):
-    return "page to edit a menu item. Task 2 complete!"
-
+    edited_menu_item = session.query(MenuItem).filter_by(id=menu_id).one()
+    if request.method == 'POST':
+        pass #Edit fields, name, price, description
+    session.add(edited_menu_item)
+    session.commit()
+    return redirect(url_for(restaurantMenu, restaurant_id=restaurant_id))
 
 # Create a route for deleteMenuItem function
 @app.route('/restaurant/<int:restaurant_id>/<int:menu_id>/delete/')
