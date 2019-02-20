@@ -15,14 +15,12 @@ def isEmpty(inp):
     empty = ''
     if isinstance(inp, ImmutableMultiDict):
         for k,v in inp.items():
-            print(k,v)
             if v is empty:
                 continue
             return False
         return True
     else:
         for item in inp:
-            print(item)
             if item is empty:                
                 continue
             return False
