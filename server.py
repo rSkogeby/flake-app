@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from werkzeug.datastructures import ImmutableMultiDict
 app = Flask(__name__) 
 import copy
@@ -27,6 +27,7 @@ def isEmpty(inp):
             return False
         return True
 
+
 @app.route('/restaurant/<int:restaurant_id>/')
 def restaurantMenu(restaurant_id):
     DBSession = sessionmaker(bind=engine)
@@ -36,7 +37,16 @@ def restaurantMenu(restaurant_id):
     return render_template('menu.html', restaurant=restaurant, items=items)
 
 
-# Create route for newMenuItem function
+# API endpoint
+@app.route('/restaurant/<int:restaurant_id>/JSON/')
+def restaurantMenuJSON(restaurant_id):
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
+    restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
+    items = session.query(MenuItem).filter_by(restaurant_id=restaurant.id).all()
+    return jsonify(MenuItems=[i.serialize for i in items])
+
+
 @app.route('/restaurant/<int:restaurant_id>/create/', methods=['GET', 'POST'])
 def newMenuItem(restaurant_id):
     if request.method == 'POST':
@@ -59,7 +69,6 @@ def newMenuItem(restaurant_id):
                         code=301)
 
 
-# Create route for editMenuItem function
 @app.route('/restaurant/<int:restaurant_id>/<int:menu_id>/edit/', methods=['GET', 'POST'])
 def editMenuItem(restaurant_id, menu_id):
     DBSession = sessionmaker(bind=engine)
@@ -90,7 +99,6 @@ def editMenuItem(restaurant_id, menu_id):
                                                     i=edited_menu_item)
 
 
-# Create a route for deleteMenuItem function
 @app.route('/restaurant/<int:restaurant_id>/<int:menu_id>/delete/', methods=['GET', 'POST'])
 def deleteMenuItem(restaurant_id, menu_id):
     DBSession = sessionmaker(bind=engine)
