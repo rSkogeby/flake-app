@@ -62,11 +62,8 @@ def newMenuItem(restaurant_id):
 def editMenuItem(restaurant_id, menu_id):
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
-    edited_menu_item = session.query(MenuItem).filter_by(id=menu_id).one()
+    edited_menu_item = session.query(MenuItem).filter_by(id=menu_id, restaurant_id=restaurant_id).one()
     if request.method == 'POST':
-        #if request.form['name'] is None and request.form['description'] and None\
-        #and request.form['price'] is None:
-        #    return redirect(url_for(restaurantMenu, restaurant_id=restaurant_id))
         if isEmpty(request.form):
             return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id))
         if ~isEmpty(request.form['name']):
@@ -87,7 +84,16 @@ def editMenuItem(restaurant_id, menu_id):
 # Create a route for deleteMenuItem function
 @app.route('/restaurant/<int:restaurant_id>/<int:menu_id>/delete/')
 def deleteMenuItem(restaurant_id, menu_id):
-    return "page to delete a menu item. Task 3 complete!"
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
+    item = session.query(MenuItem).filter_by(id=menu_id, restaurant_id=restaurant_id).one()
+    if request.method == 'POST':
+        session.delete(item)
+        session.commit()
+        return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id))
+    elif request.method == 'GET':
+        return render_template('deletemenuitem.html', item=item)
+    
 
 
 if __name__ == "__main__":
