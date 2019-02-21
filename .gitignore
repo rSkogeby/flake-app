@@ -2,3 +2,4 @@
 __pycache__/
 setup.pyc
 restaurantmenu.db
+.DS_Store
