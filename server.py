@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 from werkzeug.datastructures import ImmutableMultiDict
 app = Flask(__name__) 
 
@@ -47,6 +47,7 @@ def newMenuItem(restaurant_id):
                            restaurant_id=restaurant_id)
         session.add(newItem)
         session.commit()
+        flash('New menu item created!')
         return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id),
                         code=301)
     elif request.method == 'GET':
@@ -95,7 +96,7 @@ def deleteMenuItem(restaurant_id, menu_id):
         return render_template('deletemenuitem.html', item=deletion_item)
     
 
-
 if __name__ == "__main__":
+    app.secret_key = 'my_very_secret_key'
     app.debug = True
     app.run(host='127.0.0.1', port=5000)
