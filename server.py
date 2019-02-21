@@ -3,6 +3,7 @@ from sqlalchemy.orm import sessionmaker
 from flask import Flask, render_template, request, redirect, url_for, flash
 from werkzeug.datastructures import ImmutableMultiDict
 app = Flask(__name__) 
+import copy
 
 from db_setup import Base, Restaurant, MenuItem
 
@@ -64,17 +65,24 @@ def editMenuItem(restaurant_id, menu_id):
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     edited_menu_item = session.query(MenuItem).filter_by(id=menu_id, restaurant_id=restaurant_id).one()
+    old = copy.deepcopy(edited_menu_item)
+    flash_string = ''
     if request.method == 'POST':
         if isEmpty(request.form):
             return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id))
-        if ~isEmpty(request.form['name']):
+        if isEmpty(request.form['name']) == False:
             edited_menu_item.name=request.form['name']
-        if ~isEmpty(request.form['description']):
+            flash_string += 'Name: {}->{} '.format(old.name, edited_menu_item.name)
+        if isEmpty(request.form['description']) == False:
             edited_menu_item.description=request.form['description']
-        if ~isEmpty(request.form['price']):
+            flash_string += 'Description: {}->{} '.format(old.description, edited_menu_item.description)
+        if isEmpty(request.form['price']) == False:
             edited_menu_item.price=request.form['price']
+            flash_string += 'Price: {}->{} '.format(old.price, edited_menu_item.description)
         session.add(edited_menu_item)
         session.commit()
+
+        flash('{} has been edited: {}'.format(edited_menu_item.name, flash_string))
         return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id))
     elif request.method == 'GET':
         return render_template('editmenuitem.html', restaurant_id=restaurant_id, 
@@ -91,12 +99,13 @@ def deleteMenuItem(restaurant_id, menu_id):
     if request.method == 'POST':
         session.delete(deletion_item)
         session.commit()
+        flash('{} has been deleted'.format(deletion_item.name))
         return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id))
     elif request.method == 'GET':
         return render_template('deletemenuitem.html', item=deletion_item)
     
 
 if __name__ == "__main__":
-    app.secret_key = 'my_very_secret_key'
+    app.secret_key = 'a_very_secret_key'
     app.debug = True
     app.run(host='127.0.0.1', port=5000)
