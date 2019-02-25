@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+"""Restaurant menu app for the browser."""
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
@@ -27,9 +30,10 @@ def isEmpty(inp):
             return False
         return True
 
-
+# All restaurants
 @app.route('/restaurant/<int:restaurant_id>/')
 def restaurantMenu(restaurant_id):
+    """Display a restaurant's menu."""
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
@@ -40,6 +44,7 @@ def restaurantMenu(restaurant_id):
 # API endpoint
 @app.route('/restaurant/<int:restaurant_id>/JSON/')
 def restaurantMenuJSON(restaurant_id):
+    """API endpoint for displaying the menu of a restaurant."""
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
@@ -50,6 +55,7 @@ def restaurantMenuJSON(restaurant_id):
 # API endpoint
 @app.route('/restaurant/<int:restaurant_id>/menu/<int:menu_id>/JSON/')
 def menuItemJSON(restaurant_id, menu_id):
+    """API endpoint for displaying a menu item."""
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
@@ -59,6 +65,7 @@ def menuItemJSON(restaurant_id, menu_id):
 
 @app.route('/restaurant/<int:restaurant_id>/create/', methods=['GET', 'POST'])
 def newMenuItem(restaurant_id):
+    """Create new menu entry."""
     if request.method == 'POST':
         DBSession = sessionmaker(bind=engine)
         session = DBSession()
@@ -81,6 +88,7 @@ def newMenuItem(restaurant_id):
 
 @app.route('/restaurant/<int:restaurant_id>/<int:menu_id>/edit/', methods=['GET', 'POST'])
 def editMenuItem(restaurant_id, menu_id):
+    """Edit menu entry."""
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     edited_menu_item = session.query(MenuItem).filter_by(id=menu_id, restaurant_id=restaurant_id).one()
@@ -111,6 +119,7 @@ def editMenuItem(restaurant_id, menu_id):
 
 @app.route('/restaurant/<int:restaurant_id>/<int:menu_id>/delete/', methods=['GET', 'POST'])
 def deleteMenuItem(restaurant_id, menu_id):
+    """Delete menu entry."""
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     deletion_item = session.query(MenuItem).filter_by(id=menu_id, restaurant_id=restaurant_id).one()
