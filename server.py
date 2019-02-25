@@ -50,28 +50,6 @@ def showMenu(restaurant_id):
     return render_template('showmenu.html', restaurant=restaurant, items=items)
 
 
-# API endpoint
-@app.route('/restaurant/<int:restaurant_id>/JSON/')
-def restaurantMenuJSON(restaurant_id):
-    """API endpoint for displaying the menu of a restaurant."""
-    DBSession = sessionmaker(bind=engine)
-    session = DBSession()
-    restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
-    items = session.query(MenuItem).filter_by(restaurant_id=restaurant.id).all()
-    return jsonify(MenuItems=[i.serialize for i in items])
-
-
-# API endpoint
-@app.route('/restaurant/<int:restaurant_id>/menu/<int:menu_id>/JSON/')
-def menuItemJSON(restaurant_id, menu_id):
-    """API endpoint for displaying a menu item."""
-    DBSession = sessionmaker(bind=engine)
-    session = DBSession()
-    restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
-    item = session.query(MenuItem).filter_by(id=menu_id).one()
-    return jsonify(MenuItem=item.serialize)
-
-
 @app.route('/restaurant/new/', methods=['GET', 'POST'])
 def newRestaurant():
     """Create new restaurant."""
@@ -197,6 +175,29 @@ def deleteMenuItem(restaurant_id, menu_id):
     elif request.method == 'GET':
         return render_template('deletemenuitem.html', item=deletion_item)
     
+
+
+# API endpoint
+@app.route('/restaurant/<int:restaurant_id>/JSON/')
+def restaurantMenuJSON(restaurant_id):
+    """API endpoint for displaying the menu of a restaurant."""
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
+    restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
+    items = session.query(MenuItem).filter_by(restaurant_id=restaurant.id).all()
+    return jsonify(MenuItems=[i.serialize for i in items])
+
+
+# API endpoint
+@app.route('/restaurant/<int:restaurant_id>/menu/<int:menu_id>/JSON/')
+def menuItemJSON(restaurant_id, menu_id):
+    """API endpoint for displaying a menu item."""
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
+    restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
+    item = session.query(MenuItem).filter_by(id=menu_id).one()
+    return jsonify(MenuItem=item.serialize)
+
 
 if __name__ == "__main__":
     app.secret_key = 'a_very_secret_key'
