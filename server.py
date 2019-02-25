@@ -91,6 +91,20 @@ def newRestaurant():
                         code=301)
 
 
+@app.route('/restaurant/<int:restaurant_id>/delete/', methods=['GET', 'POST'])
+def deleteRestaurant(restaurant_id):
+    """Delete menu entry."""
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
+    deletion_item = session.query(Restaurant).filter_by(id=restaurant_id).one()
+    if request.method == 'POST':
+        session.delete(deletion_item)
+        session.commit()
+        flash('{} has been deleted'.format(deletion_item.name))
+        return redirect(url_for('restaurants'), code=301)
+    elif request.method == 'GET':
+        return render_template('deleterestaurant.html', item=deletion_item)
+
 @app.route('/restaurant/<int:restaurant_id>/new/', methods=['GET', 'POST'])
 def newMenuItem(restaurant_id):
     """Create new menu entry."""
