@@ -30,7 +30,7 @@ def isEmpty(inp):
             return False
         return True
 
-# All restaurants
+# All menus
 @app.route('/restaurant/<int:restaurant_id>/')
 def restaurantMenu(restaurant_id):
     """Display a restaurant's menu."""
