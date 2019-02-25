@@ -32,22 +32,22 @@ def isEmpty(inp):
 
 @app.route('/')
 @app.route('/restaurants/')
-def restaurants():
+def showRestaurants():
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     restaurant_list = session.query(Restaurant).all()
-    return render_template('restaurants.html', restaurant_list=restaurant_list)
+    return render_template('showrestaurants.html', restaurant_list=restaurant_list)
 
 
 # All menus
 @app.route('/restaurant/<int:restaurant_id>/')
-def restaurantMenu(restaurant_id):
+def showMenu(restaurant_id):
     """Display a restaurant's menu."""
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
     items = session.query(MenuItem).filter_by(restaurant_id=restaurant.id)
-    return render_template('menu.html', restaurant=restaurant, items=items)
+    return render_template('showmenu.html', restaurant=restaurant, items=items)
 
 
 # API endpoint
@@ -82,12 +82,12 @@ def newRestaurant():
         session.add(newRestaurant)
         session.commit()
         flash('New restaurant created!')
-        return redirect(url_for('restaurants'),
+        return redirect(url_for('showRestaurants'),
                         code=301)
     elif request.method == 'GET':
         return render_template('newrestaurant.html')
     else:
-        return redirect(url_for('restaurants'),
+        return redirect(url_for('showRestaurants'),
                         code=301)
 
 
@@ -101,9 +101,10 @@ def deleteRestaurant(restaurant_id):
         session.delete(deletion_item)
         session.commit()
         flash('{} has been deleted'.format(deletion_item.name))
-        return redirect(url_for('restaurants'), code=301)
+        return redirect(url_for('showRestaurants'), code=301)
     elif request.method == 'GET':
         return render_template('deleterestaurant.html', item=deletion_item)
+
 
 @app.route('/restaurant/<int:restaurant_id>/new/', methods=['GET', 'POST'])
 def newMenuItem(restaurant_id):
@@ -118,14 +119,37 @@ def newMenuItem(restaurant_id):
         session.add(newItem)
         session.commit()
         flash('New menu item created!')
-        return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id),
+        return redirect(url_for('showMenu', restaurant_id=restaurant_id),
                         code=301)
     elif request.method == 'GET':
         return render_template('newmenuitem.html', restaurant_id=
             restaurant_id)
     else:
-        return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id),
+        return redirect(url_for('showMenu', restaurant_id=restaurant_id),
                         code=301)
+
+
+@app.route('/restaurant/<int:restaurant_id>/edit/', methods=['GET', 'POST'])
+def editRestaurant(restaurant_id):
+    """Edit restaurant name."""
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
+    edited_restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
+    old = copy.deepcopy(edited_restaurant)
+    flash_string = ''
+    if request.method == 'POST':
+        if isEmpty(request.form):
+            return redirect(url_for('showMenu', restaurant_id=restaurant_id))
+        if isEmpty(request.form['name']) == False:
+            edited_restaurant.name=request.form['name']
+            flash_string += 'Name: {}->{} '.format(old.name, edited_restaurant.name)
+        session.add(edited_restaurant)
+        session.commit()
+        flash('{} has been edited: {}'.format(edited_restaurant.name, flash_string))
+        return redirect(url_for('showMenu', restaurant_id=restaurant_id))
+    elif request.method == 'GET':
+        return render_template('editrestaurant.html', restaurant=edited_restaurant)
+
 
 
 @app.route('/restaurant/<int:restaurant_id>/<int:menu_id>/edit/', methods=['GET', 'POST'])
@@ -138,7 +162,7 @@ def editMenuItem(restaurant_id, menu_id):
     flash_string = ''
     if request.method == 'POST':
         if isEmpty(request.form):
-            return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id))
+            return redirect(url_for('showMenu', restaurant_id=restaurant_id))
         if isEmpty(request.form['name']) == False:
             edited_menu_item.name=request.form['name']
             flash_string += 'Name: {}->{} '.format(old.name, edited_menu_item.name)
@@ -152,7 +176,7 @@ def editMenuItem(restaurant_id, menu_id):
         session.commit()
 
         flash('{} has been edited: {}'.format(edited_menu_item.name, flash_string))
-        return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id))
+        return redirect(url_for('showMenu', restaurant_id=restaurant_id))
     elif request.method == 'GET':
         return render_template('editmenuitem.html', restaurant_id=restaurant_id, 
                                                     menu_id=menu_id,
@@ -169,7 +193,7 @@ def deleteMenuItem(restaurant_id, menu_id):
         session.delete(deletion_item)
         session.commit()
         flash('{} has been deleted'.format(deletion_item.name))
-        return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id))
+        return redirect(url_for('showMenu', restaurant_id=restaurant_id))
     elif request.method == 'GET':
         return render_template('deletemenuitem.html', item=deletion_item)
     
