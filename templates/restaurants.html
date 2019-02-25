@@ -16,8 +16,8 @@
     {% for restaurant in restaurant_list %}
         <p>{{restaurant.name}}<br/>
         <a href={{url_for('restaurantMenu', restaurant_id=restaurant.id)}}>menu</a> | 
-        <a href={{url_for('deleteRestaurant', restaurant_id=restaurant.id)}}>delete</a> | 
-        <a href={{url_for('editRestaurant', restaurant_id=restaurant.id)}}>edit</a>
+        <a href={{url_for('editRestaurant', restaurant_id=restaurant.id)}}>edit</a> |
+        <a href={{url_for('deleteRestaurant', restaurant_id=restaurant.id)}}>delete</a>
         </p>
     {% endfor %}
 
