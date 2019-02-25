@@ -72,7 +72,7 @@ def menuItemJSON(restaurant_id, menu_id):
     return jsonify(MenuItem=item.serialize)
 
 
-@app.route('/restaurant/<int:restaurant_id>/create/', methods=['GET', 'POST'])
+@app.route('/restaurant/<int:restaurant_id>/new/', methods=['GET', 'POST'])
 def newMenuItem(restaurant_id):
     """Create new menu entry."""
     if request.method == 'POST':
