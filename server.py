@@ -30,6 +30,15 @@ def isEmpty(inp):
             return False
         return True
 
+@app.route('/')
+@app.route('/restaurants/')
+def restaurants():
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
+    restaurant_list = session.query(Restaurant).all()
+    return render_template('restaurants.html', restaurant_list=restaurant_list)
+
+
 # All menus
 @app.route('/restaurant/<int:restaurant_id>/')
 def restaurantMenu(restaurant_id):
