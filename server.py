@@ -193,6 +193,16 @@ def deleteMenuItem(restaurant_id, menu_id):
 
 
 # API endpoint
+@app.route('/restaurants/JSON/')
+def showRestaurantsJSON():
+    """API endpoint for displaying the restaurants."""
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
+    restaurants = session.query(Restaurant).all()
+    return jsonify(Restaurants=[i.serialize for i in restaurants])
+
+
+# API endpoint
 @app.route('/restaurant/<int:restaurant_id>/menu/JSON/')
 def restaurantMenuJSON(restaurant_id):
     """API endpoint for displaying the menu of a restaurant."""
