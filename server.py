@@ -193,7 +193,7 @@ def deleteMenuItem(restaurant_id, menu_id):
 
 
 # API endpoint
-@app.route('/restaurant/<int:restaurant_id>/JSON/')
+@app.route('/restaurant/<int:restaurant_id>/menu/JSON/')
 def restaurantMenuJSON(restaurant_id):
     """API endpoint for displaying the menu of a restaurant."""
     DBSession = sessionmaker(bind=engine)
