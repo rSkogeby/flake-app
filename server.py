@@ -72,6 +72,25 @@ def menuItemJSON(restaurant_id, menu_id):
     return jsonify(MenuItem=item.serialize)
 
 
+@app.route('/restaurant/new/', methods=['GET', 'POST'])
+def newRestaurant():
+    """Create new restaurant."""
+    if request.method == 'POST':
+        DBSession = sessionmaker(bind=engine)
+        session = DBSession()
+        newRestaurant = Restaurant(name=request.form['name'])                          
+        session.add(newRestaurant)
+        session.commit()
+        flash('New restaurant created!')
+        return redirect(url_for('restaurants'),
+                        code=301)
+    elif request.method == 'GET':
+        return render_template('newrestaurant.html')
+    else:
+        return redirect(url_for('restaurants'),
+                        code=301)
+
+
 @app.route('/restaurant/<int:restaurant_id>/new/', methods=['GET', 'POST'])
 def newMenuItem(restaurant_id):
     """Create new menu entry."""
