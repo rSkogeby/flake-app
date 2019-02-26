@@ -127,6 +127,11 @@ def isEmpty(inp):
         return True
 
 
+@app.route('/gdisconnect')
+def gdisconnect():
+    pass
+
+
 @app.route('/')
 @app.route('/restaurants/')
 def showRestaurants():
