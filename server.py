@@ -199,6 +199,8 @@ def newRestaurant():
 @app.route('/restaurant/<int:restaurant_id>/delete/', methods=['GET', 'POST'])
 def deleteRestaurant(restaurant_id):
     """Delete menu entry."""
+    if 'username' not in login_session:
+        return redirect('/login')
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     deletion_item = session.query(Restaurant).filter_by(id=restaurant_id).one()
@@ -214,6 +216,8 @@ def deleteRestaurant(restaurant_id):
 @app.route('/restaurant/<int:restaurant_id>/new/', methods=['GET', 'POST'])
 def newMenuItem(restaurant_id):
     """Create new menu entry."""
+    if 'username' not in login_session:
+        return redirect('/login')
     if request.method == 'POST':
         DBSession = sessionmaker(bind=engine)
         session = DBSession()
@@ -236,6 +240,8 @@ def newMenuItem(restaurant_id):
 @app.route('/restaurant/<int:restaurant_id>/edit/', methods=['GET', 'POST'])
 def editRestaurant(restaurant_id):
     """Edit restaurant name."""
+    if 'username' not in login_session:
+        return redirect('/login')
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     edited_restaurant = session.query(Restaurant).\
@@ -263,6 +269,8 @@ def editRestaurant(restaurant_id):
            methods=['GET', 'POST'])
 def editMenuItem(restaurant_id, menu_id):
     """Edit menu entry."""
+    if 'username' not in login_session:
+        return redirect('/login')
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     edited_menu_item = session.query(MenuItem).\
@@ -301,6 +309,8 @@ def editMenuItem(restaurant_id, menu_id):
            methods=['GET', 'POST'])
 def deleteMenuItem(restaurant_id, menu_id):
     """Delete menu entry."""
+    if 'username' not in login_session:
+        return redirect('/login')
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     deletion_item = session.query(MenuItem).\
