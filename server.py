@@ -144,7 +144,9 @@ def gdisconnect():
         del login_session['username']
         del login_session['email']
         del login_session['picture']
-    return 'gdisconnect'
+    response = make_response(json.dumps('Successfully disconnected.'), 200)
+    response.headers['Content-Type'] = 'application/json'
+    return response
 
 
 @app.route('/')
