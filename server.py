@@ -127,9 +127,14 @@ def isEmpty(inp):
         return True
 
 
-@app.route('/gdisconnect')
+@app.route('/gdisconnect', methods=['POST'])
 def gdisconnect():
-    pass
+    credentials = login_session.get('credentials')
+    if credentials is None:
+        response = make_response(json.dumps('Current user not connected.'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    return 'gdisconnect'
 
 
 @app.route('/')
