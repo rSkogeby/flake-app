@@ -127,14 +127,13 @@ def isEmpty(inp):
         return True
 
 
-@app.route('/gdisconnect', methods=['POST'])
+@app.route('/gdisconnect')
 def gdisconnect():
-    credentials = login_session.get('credentials')
-    if credentials is None:
+    access_token = login_session.get('credentials')
+    if access_token is None:
         response = make_response(json.dumps('Current user not connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
-    access_token = credentials.access_token
     url = 'https://accounts.google.com/o/oauth2/revoke?token={}'.format(access_token)
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
@@ -179,6 +178,8 @@ def showMenu(restaurant_id):
 @app.route('/restaurant/new/', methods=['GET', 'POST'])
 def newRestaurant():
     """Create new restaurant."""
+    if 'username' not in login_session:
+        return redirect('/login')
     if request.method == 'POST':
         DBSession = sessionmaker(bind=engine)
         session = DBSession()
