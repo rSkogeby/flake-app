@@ -6,8 +6,10 @@ from sqlalchemy.orm import sessionmaker
 from flask import Flask, render_template, request, redirect,\
                   url_for, flash, jsonify
 from flask import session as login_session
-import random, string
 from werkzeug.datastructures import ImmutableMultiDict
+from oauth2client.client import flow_from_clientsecrets
+from oauth2client.client import FlowExchangeError
+import random, string
 import copy
 
 from db_setup import Base, Restaurant, MenuItem
@@ -16,6 +18,13 @@ app = Flask(__name__)
 engine = create_engine('sqlite:///restaurantmenu.db',
                        connect_args={'check_same_thread': False})
 Base.metadata.bind = engine
+
+
+@app.route('/login/')
+def showLogin():
+    state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
+    login_session['state'] = state
+    return render_template('login.html')
 
 
 def isEmpty(inp):
