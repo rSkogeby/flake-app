@@ -4,15 +4,22 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from flask import Flask, render_template, request, redirect,\
-                  url_for, flash, jsonify
+                  url_for, flash, jsonify, make_response
 from flask import session as login_session
 from werkzeug.datastructures import ImmutableMultiDict
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
+import httplib2
+import json
 import random, string
+import requests
 import copy
 
 from db_setup import Base, Restaurant, MenuItem
+
+CLIENT_ID = json.loads(
+    open('client_secrets.json', 'r').read()['web']['client_id']
+)
 
 app = Flask(__name__)
 engine = create_engine('sqlite:///restaurantmenu.db',
