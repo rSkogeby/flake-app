@@ -132,6 +132,7 @@ def gconnect():
     login_session['email'] = data['email']
 
     # See if user exists if it doesn't, create a new one.
+
     user_id = getUserID(login_session['username'])
     if user_id == None:
         user_id = createUser(login_session)    
@@ -199,7 +200,11 @@ def showRestaurants():
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     restaurant_list = session.query(Restaurant).all()
-    return render_template('showrestaurants.html',
+    if 'username' not in login_session:
+        return render_template('publicshowrestaurants.html',
+                           restaurant_list=restaurant_list)
+    else:
+        return render_template('showrestaurants.html',
                            restaurant_list=restaurant_list)
 
 
@@ -243,7 +248,11 @@ def deleteRestaurant(restaurant_id):
         return redirect('/login')
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
-    deletion_item = session.query(Restaurant).filter_by(id=restaurant_id).one()
+    deletion_item = session.query(Restaurant).filter_by(id=restaurant_id,
+        user_id=login_session['user_id']).one()
+    if deletion_item == None:
+        deletion_item = session.query(Restaurant).filter_by(id=restaurant_id,
+        user_id=None).one()
     if request.method == 'POST':
         session.delete(deletion_item)
         session.commit()
