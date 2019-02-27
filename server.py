@@ -311,8 +311,7 @@ def deleteMenuItem(restaurant_id, menu_id):
     """Delete menu entry."""
     if 'username' not in login_session:
         return redirect('/login')
-    DBSession = sessionmaker(bind=engine)
-    session = DBSession()
+    DBSession = sessionmaker(bind=engine)    session = DBSession()
     deletion_item = session.query(MenuItem).\
         filter_by(id=menu_id, restaurant_id=restaurant_id).one()
     if request.method == 'POST':
@@ -355,6 +354,19 @@ def menuItemJSON(restaurant_id, menu_id):
     restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
     item = session.query(MenuItem).filter_by(id=menu_id).one()
     return jsonify(MenuItem=item.serialize)
+
+
+def createUser(login_session):
+    """Add new user to DB."""
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
+    newUser = User(name=login_session['username'],
+                   email=login_session['email'],
+                   picture=login_session['picture'])
+    session.add(newUser)
+    session.commit()
+    user = session.query(User).filter_by(email=login_session['email']).one()
+    return user.id
 
 
 if __name__ == "__main__":
