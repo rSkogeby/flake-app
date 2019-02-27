@@ -369,6 +369,12 @@ def createUser(login_session):
     return user.id
 
 
+def getUserInfo(user_id):
+    """Fetch stored info on user"""
+    user = session.query(User).filter_by(id=user_id).one()
+    return user
+
+
 if __name__ == "__main__":
     app.secret_key = 'a_very_secret_key'
     app.run(host='localhost', port=5000, debug=True)
