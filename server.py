@@ -356,6 +356,19 @@ def menuItemJSON(restaurant_id, menu_id):
     return jsonify(MenuItem=item.serialize)
 
 
+def getUserID(email):
+    try:
+        user = session.query(User).filter_by(email=email).one()
+        return user.id
+    except:
+        return None
+
+def getUserInfo(user_id):
+    """Fetch stored info on user."""
+    user = session.query(User).filter_by(id=user_id).one()
+    return user
+
+
 def createUser(login_session):
     """Add new user to DB."""
     DBSession = sessionmaker(bind=engine)
@@ -367,12 +380,6 @@ def createUser(login_session):
     session.commit()
     user = session.query(User).filter_by(email=login_session['email']).one()
     return user.id
-
-
-def getUserInfo(user_id):
-    """Fetch stored info on user"""
-    user = session.query(User).filter_by(id=user_id).one()
-    return user
 
 
 if __name__ == "__main__":
