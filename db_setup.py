@@ -42,10 +42,10 @@ class Restaurant(Base):
     user_id = Column(
         Integer, ForeignKey('user.id')
     )
+    user = relationship(User)
     id = Column(
         Integer, primary_key = True
     )
-    user = relationship(User)
 
     @property
     def serialize(self):
@@ -71,10 +71,10 @@ class MenuItem(Base):
     restaurant_id = Column(
         Integer, ForeignKey('restaurant.id')
     )
+    restaurant = relationship(Restaurant)
     user_id = Column(
         Integer, ForeignKey('user.id')
     )
-    restaurant = relationship(Restaurant)
     user = relationship(User)
 
     @property
@@ -99,7 +99,7 @@ if __name__ == "__main__":
 
 
 engine = create_engine(
-    'sqlite:///restaurantmenu.db'
+    'sqlite:///restaurantmenuwithusers.db'
 )
 
 Base.metadata.create_all(engine)
