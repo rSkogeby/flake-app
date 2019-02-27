@@ -132,18 +132,11 @@ def gconnect():
     login_session['email'] = data['email']
 
     # See if user exists if it doesn't, create a new one.
-    # getUserID
-    # createUser
-    # getUserInfo
     user_id = getUserID(login_session['username'])
     if user_id == None:
-        DBSession = sessionmaker(bind=engine)
-        session = DBSession()
-        new_user = User(name=login_session['username'],
-                        email=login_session['email'],
-                        picture=login_session['picture'])
-        session.commit(new_user)
-        session.close()
+        user_id = createUser(login_session)
+    login_session['user_id'] = user_id
+    user = getUserInfo(login_session['user_id'])
 
     output = ''
     output += '<h1>Welcome, '
