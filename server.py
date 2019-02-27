@@ -183,7 +183,8 @@ def newRestaurant():
     if request.method == 'POST':
         DBSession = sessionmaker(bind=engine)
         session = DBSession()
-        newRestaurant = Restaurant(name=request.form['name'])
+        newRestaurant = Restaurant(name=request.form['name'], 
+            user_id=login_session['user_id'])
         session.add(newRestaurant)
         session.commit()
         flash('New restaurant created!')
@@ -218,13 +219,15 @@ def newMenuItem(restaurant_id):
     """Create new menu entry."""
     if 'username' not in login_session:
         return redirect('/login')
+    restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
     if request.method == 'POST':
         DBSession = sessionmaker(bind=engine)
         session = DBSession()
         newItem = MenuItem(name=request.form['name'],
                            description=request.form['description'],
                            price=request.form['price'],
-                           restaurant_id=restaurant_id)
+                           restaurant_id=restaurant_id,
+                           user_id=restaurant.user_id)
         session.add(newItem)
         session.commit()
         flash('New menu item created!')
