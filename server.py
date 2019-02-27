@@ -215,8 +215,15 @@ def showMenu(restaurant_id):
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
+    creator = getUserInfo(restaurant_id)
     items = session.query(MenuItem).filter_by(restaurant_id=restaurant.id)
-    return render_template('showmenu.html', restaurant=restaurant, items=items)
+    if 'username' not in login_session or\
+        creator.id != login_session['user_id']:
+        return render_template('publicshowmenu.html', restaurant=restaurant,
+                               items=items, creator=creator)
+    else:
+        return render_template('showmenu.html', restaurant=restaurant,
+                               items=items, creator=creator)
 
 
 @app.route('/restaurant/new/', methods=['GET', 'POST'])
