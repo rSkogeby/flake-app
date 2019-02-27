@@ -357,7 +357,10 @@ def menuItemJSON(restaurant_id, menu_id):
 
 
 def getUserID(email):
+    """Fetch user ID if in DB, else return None."""
     try:
+        DBSession = sessionmaker(bind=engine)
+        session = DBSession()
         user = session.query(User).filter_by(email=email).one()
         return user.id
     except:
@@ -365,6 +368,8 @@ def getUserID(email):
 
 def getUserInfo(user_id):
     """Fetch stored info on user."""
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
     user = session.query(User).filter_by(id=user_id).one()
     return user
 
