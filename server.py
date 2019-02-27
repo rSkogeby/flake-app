@@ -29,6 +29,38 @@ engine = create_engine('sqlite:///restaurantmenu.db',
 Base.metadata.bind = engine
 
 
+def getUserID(email):
+    """Fetch user ID if in DB, else return None."""
+    try:
+        DBSession = sessionmaker(bind=engine)
+        session = DBSession()
+        user = session.query(User).filter_by(email=email).one()
+        return user.id
+    except:
+        return None
+
+
+def getUserInfo(user_id):
+    """Fetch stored info on user."""
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
+    user = session.query(User).filter_by(id=user_id).one()
+    return user
+
+
+def createUser(login_session):
+    """Add new user to DB."""
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
+    newUser = User(name=login_session['username'],
+                   email=login_session['email'],
+                   picture=login_session['picture'])
+    session.add(newUser)
+    session.commit()
+    user = session.query(User).filter_by(email=login_session['email']).one()
+    return user.id
+
+
 @app.route('/login/', methods=['GET', 'POST'])
 def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
@@ -98,6 +130,21 @@ def gconnect():
     login_session['username'] = data['email']
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
+
+    # See if user exists if it doesn't, create a new one.
+    # getUserID
+    # createUser
+    # getUserInfo
+    user_id = getUserID(login_session['username'])
+    if user_id == None:
+        DBSession = sessionmaker(bind=engine)
+        session = DBSession()
+        new_user = User(name=login_session['username'],
+                        email=login_session['email'],
+                        picture=login_session['picture'])
+        session.commit(new_user)
+        session.close()
+
     output = ''
     output += '<h1>Welcome, '
     output += login_session['username']
@@ -357,37 +404,6 @@ def menuItemJSON(restaurant_id, menu_id):
     restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
     item = session.query(MenuItem).filter_by(id=menu_id).one()
     return jsonify(MenuItem=item.serialize)
-
-
-def getUserID(email):
-    """Fetch user ID if in DB, else return None."""
-    try:
-        DBSession = sessionmaker(bind=engine)
-        session = DBSession()
-        user = session.query(User).filter_by(email=email).one()
-        return user.id
-    except:
-        return None
-
-def getUserInfo(user_id):
-    """Fetch stored info on user."""
-    DBSession = sessionmaker(bind=engine)
-    session = DBSession()
-    user = session.query(User).filter_by(id=user_id).one()
-    return user
-
-
-def createUser(login_session):
-    """Add new user to DB."""
-    DBSession = sessionmaker(bind=engine)
-    session = DBSession()
-    newUser = User(name=login_session['username'],
-                   email=login_session['email'],
-                   picture=login_session['picture'])
-    session.add(newUser)
-    session.commit()
-    user = session.query(User).filter_by(email=login_session['email']).one()
-    return user.id
 
 
 if __name__ == "__main__":
