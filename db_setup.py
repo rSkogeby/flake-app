@@ -52,6 +52,31 @@ class MenuItem(Base):
             'course': self.course,
         }
 
+class User(Base):
+    __tablename__ = 'user'
+    name = Column(
+        String(80), nullable = False
+    )
+    email = Column(
+        String(80), nullable = False
+    )
+    picture = Column(
+        String(160), nullable = False
+    )
+    id = Column(
+        Integer, primary_key = True
+    )
+
+    @property
+    def serialize(self):
+        # Return object data in easily serialisable format
+        return {
+            'name': self.name,
+            'email': self.email,
+            'picture': self.picture,
+            'id': self.id
+        }
+
 def main():
     pass
 
