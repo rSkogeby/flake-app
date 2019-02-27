@@ -15,7 +15,7 @@ import random, string
 import requests
 import copy
 
-from db_setup import Base, Restaurant, MenuItem
+from db_setup import Base, Restaurant, MenuItem, User
 
 CLIENT_ID = json.loads(
         open('client_secrets.json', 'r').read()
