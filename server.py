@@ -24,7 +24,7 @@ APPLICATION_NAME = "Restaurant Menu Application"
 
 
 app = Flask(__name__)
-engine = create_engine('sqlite:///restaurantmenu.db',
+engine = create_engine('sqlite:///restaurantmenuwithusers.db',
                        connect_args={'check_same_thread': False})
 Base.metadata.bind = engine
 
@@ -130,13 +130,12 @@ def gconnect():
     login_session['username'] = data['email']
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
-
     # See if user exists if it doesn't, create a new one.
 
-    user_id = getUserID(login_session['username'])
-    if user_id == None:
-        user_id = createUser(login_session)    
-    user = getUserInfo(user_id)
+    user_id = getUserID(data['email'])
+    if not user_id:
+        user_id = createUser(login_session)
+    login_session['user_id'] = user_id
 
     output = ''
     output += '<h1>Welcome, '
@@ -215,10 +214,10 @@ def showMenu(restaurant_id):
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
-    creator = getUserInfo(restaurant_id)
-    items = session.query(MenuItem).filter_by(restaurant_id=restaurant.id)
+    creator = getUserInfo(restaurant.user_id)
+    items = session.query(MenuItem).filter_by(restaurant_id=restaurant_id).all()
     if 'username' not in login_session or\
-        creator.id != login_session['user_id']:
+        creator.id != login_session.get('user_id'):
         return render_template('publicshowmenu.html', restaurant=restaurant,
                                items=items, creator=creator)
     else:
@@ -255,11 +254,7 @@ def deleteRestaurant(restaurant_id):
         return redirect('/login')
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
-    deletion_item = session.query(Restaurant).filter_by(id=restaurant_id,
-        user_id=login_session['user_id']).one()
-    if deletion_item == None:
-        deletion_item = session.query(Restaurant).filter_by(id=restaurant_id,
-        user_id=None).one()
+    deletion_item = session.query(Restaurant).filter_by(id=restaurant_id).one()
     if request.method == 'POST':
         session.delete(deletion_item)
         session.commit()
@@ -369,7 +364,8 @@ def deleteMenuItem(restaurant_id, menu_id):
     """Delete menu entry."""
     if 'username' not in login_session:
         return redirect('/login')
-    DBSession = sessionmaker(bind=engine)    session = DBSession()
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
     deletion_item = session.query(MenuItem).\
         filter_by(id=menu_id, restaurant_id=restaurant_id).one()
     if request.method == 'POST':
