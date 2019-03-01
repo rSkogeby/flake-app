@@ -1,0 +1,22 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+<h1>Public Restaurants</h1>
+
+<p>{% with messages = get_flashed_messages() %}
+        {% if messages%}
+        {% for message in messages %}
+        <em><strong>{{message}}</strong></em>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}</p><br/>
+
+    {% for restaurant in restaurant_list %}
+        <p>{{restaurant.name}}<br/>
+        <a href={{url_for('showMenu', restaurant_id=restaurant.id)}}>menu</a> | 
+        <a href={{url_for('editRestaurant', restaurant_id=restaurant.id)}}>edit</a> |
+        <a href={{url_for('deleteRestaurant', restaurant_id=restaurant.id)}}>delete</a>
+        </p>
+    {% endfor %}
+
+{% endblock %}
