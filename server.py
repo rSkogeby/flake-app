@@ -68,6 +68,11 @@ def showLogin():
     return render_template('login.html', STATE=state)
 
 
+@app.route('/logout/', methods=['GET'])
+def showLogout():
+    return redirect(url_for('gdisconnect'))
+
+
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     if request.args.get('state') != login_session['state']:
@@ -166,7 +171,7 @@ def isEmpty(inp):
         return True
 
 
-@app.route('/gdisconnect')
+@app.route('/gdisconnect/', methods=['POST'])
 def gdisconnect():
     access_token = login_session.get('credentials')
     if access_token is None:
@@ -269,10 +274,10 @@ def newMenuItem(restaurant_id):
     """Create new menu entry."""
     if 'username' not in login_session:
         return redirect('/login')
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
     restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
     if request.method == 'POST':
-        DBSession = sessionmaker(bind=engine)
-        session = DBSession()
         newItem = MenuItem(name=request.form['name'],
                            description=request.form['description'],
                            price=request.form['price'],
