@@ -98,8 +98,8 @@ def fbconnect():
     # Use token to get user info from API.
     userinfo_url = 'https://graph.facebook.com/v2.2/me'
     # Strip expire tag from access token.
-    token = result.split('&')[0]
-    url='https://graph.facebook.com/v2.2/me?{}'.format(token)
+    token = result.split(',')[0].split(':')[1].replace('"', '')
+    url = 'https://graph.facebook.com/v2.8/me?access_token={}&fields=name,id,email'.format(token)
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
     data = json.loads(result)
@@ -107,6 +107,7 @@ def fbconnect():
     login_session['username'] = data['name']
     login_session['email'] = data['email']
     login_session['facebook_id'] = data['id']
+    login_session['access_token'] = token
     # Get user picture
     url = 'https://graph.facebook.com/v2.2/me/picture?{}\
            &redirect=0&height=200&width=200'.format(token)
@@ -254,19 +255,11 @@ def disconnect():
 @app.route('/fbdisconnect', methods=['POST'])
 def fbdisconnect():
     facebook_id = login_session['facebook_id']
-    url = 'https://graph.facebook.com/{}/permissions'.format(facebook_id)
-    access_token = login_session.get('credentials')
-    if access_token is None:
-        response = make_response(json.dumps('Current user not connected.'), 401)
-        response.headers['Content-Type'] = 'application/json'
-        return response
+    # The access token must me included to successfully logout
+    access_token = login_session['access_token']
+    url = 'https://graph.facebook.com/{}/permissions?access_token={}'.format(facebook_id, access_token)
     h = httplib2.Http()
     result = h.request(url, 'DELETE')[1]
-    del login_session['facebook_id']
-    del login_session['user_id']
-    del login_session['username']
-    del login_session['email']
-    del login_session['picture']
     response = make_response(json.dumps('Successfully disconnected.'), 200)
     response.headers['Content-Type'] = 'application/json'
     return response
