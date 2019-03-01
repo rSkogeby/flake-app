@@ -71,6 +71,14 @@ h3 {
 	border-color: #aaaaaa;
 	color: red;
 }
+.btn.logout {
+	border-color: #ffffff;
+	color: #ffffff;
+}
+.btn.logout:hover {
+	border-color: #c91d1d;
+	color: red;
+}
 .glyphicon {
 	margin-right: 10px;
 }
