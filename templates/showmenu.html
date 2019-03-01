@@ -3,6 +3,17 @@
 {% include "header.html" %}
     <h1>{{restaurant.name}}</h1>
 
+    <div class="row banner menu">
+		<div class="col-md-11 col-md-offset-1 padding-none">
+			<h1>{{ restaurant.name }}
+			<figure class="creator">
+				<img src="{{ creator.picture}}">
+				<figcaption>{{ creator.name }}</figcaption>
+			</figure>
+			</h1>
+		</div>
+	</div>
+
         <p>{% with messages = get_flashed_messages() %}
         {% if messages%}
         {% for message in messages %}
