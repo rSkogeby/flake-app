@@ -192,6 +192,7 @@ def gconnect():
     params = {'access_token': credentials.access_token, 'alt': 'json'}
     answer = requests.get(userinfo_url, params=params)
     data = answer.json()
+    login_session['provider'] = 'google'
     login_session['username'] = data['email']
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
@@ -231,7 +232,48 @@ def isEmpty(inp):
         return True
 
 
-@app.route('/gdisconnect/', methods=['POST'])
+@app.route('/disconnect', methods=['POST'])
+def disconnect():
+    if 'provider' in login_session:
+        if login_session['provider'] == 'google':
+            gdisconnect()
+            del login_session['credentials']
+            del login_session['gplus_id']
+        if login_session['provider'] == 'facebook':
+            del login_session['facebook_id']
+        del login_session['username']
+        del login_session['email']
+        del login_session['picture']
+        del login_session['user_id']
+        del login_session['provider']
+        flash("You have successfully been logged out.")
+    else:
+        flash("You were not logged in to begin with!")
+    return redirect(url_for('showRestaurants'))
+
+@app.route('/fbdisconnect', methods=['POST'])
+def fbdisconnect():
+    facebook_id = login_session['facebook_id']
+    url = 'https://graph.facebook.com/{}/permissions'.format(facebook_id)
+    access_token = login_session.get('credentials')
+    if access_token is None:
+        response = make_response(json.dumps('Current user not connected.'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    h = httplib2.Http()
+    result = h.request(url, 'DELETE')[1]
+    del login_session['facebook_id']
+    del login_session['user_id']
+    del login_session['username']
+    del login_session['email']
+    del login_session['picture']
+    response = make_response(json.dumps('Successfully disconnected.'), 200)
+    response.headers['Content-Type'] = 'application/json'
+    return response
+
+
+
+@app.route('/gdisconnect', methods=['POST'])
 def gdisconnect():
     access_token = login_session.get('credentials')
     if access_token is None:
