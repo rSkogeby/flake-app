@@ -18,6 +18,16 @@
             data-approvalprompt="force">
           </span>
         </div>
+        <button class="btn btn-default" id="facebooklogin">
+        <span class="glyphicon glyphicon-glass" aria-hidden="true"></span>
+        Login with Facebook
+          <fb:login-button
+            scope="public_profile,email"
+            onlogin="sendTokenToServer();"> 
+            <a href="javascript:sendTokenToServer()">Login with Facebook</a>
+          </fb:login-button>
+        </button>
+
 
 <div id="result"></div>
 <script>
@@ -48,6 +58,66 @@ function signInCallback(authResult) {
         }
         
     }); } }
+
+function sendTokenToServer() {
+  var access_token = FB.getAuthResponse()['accessToken']
+  console.log('Welcome! Fetching your access token...')
+  console.log(access_token)
+  FB.api('/me', function(response){
+    console.log('Successful login for: ' + response.name);
+  $.ajax({
+    type: 'POST',
+    url: '/fbconnect?state={{ STATE }}',
+    processData: false,
+    data: access_token,
+    contentType: 'application/octet-stream; charset=utf-8',
+    success: function(result) {
+      // Handle or verify the server response if necessary.
+          if (result) {
+            $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
+           setTimeout(function() {
+            window.location.href = "/";
+           }, 4000);
+            
+        } else if (authResult['error']) {
+          console.log('There was an error: ' + authResult['error']);
+        } else {
+          $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+           }
+        }
+  })
+  })
+
+
+    // Facebook login
+    window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '353495602169089',
+      cookie     : true,
+      xfbml      : true,
+      version    : 'v2.2'
+    });
+      
+    FB.AppEvents.logPageView();   
+      
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "https://connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+
+   FB.getLoginStatus(function(response) {
+    statusChangeCallback(response);
+});
+function checkLoginState() {
+  FB.getLoginStatus(function(response) {
+    statusChangeCallback(response);
+  });
+}
 </script>
 </body>
 </html>
